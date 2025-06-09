@@ -1,12 +1,13 @@
-// src/reportWebVitals.js
-import { onCLS, onFID, onLCP, onTTFB, onINP } from 'web-vitals';
+import { onCLS, onFID, onLCP, onFCP, onTTFB } from 'web-vitals';
 
-export function reportWebVitals(onPerfEntry) {
+const reportWebVitals = (onPerfEntry) => {
   if (onPerfEntry && onPerfEntry instanceof Function) {
     onCLS(onPerfEntry);
     onFID(onPerfEntry);
     onLCP(onPerfEntry);
+    onFCP(onPerfEntry);
     onTTFB(onPerfEntry);
-    onINP(onPerfEntry);
   }
-}
+};
+
+export default reportWebVitals;
