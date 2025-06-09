@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback, memo, useRef } from 'react';
 import { motion, useReducedMotion, useInView, AnimatePresence } from 'framer-motion';
 import { Github, Linkedin, Download, Volume2, VolumeX } from 'lucide-react';
 
+
 const EnhancedInteractiveHero = () => {
   const [soundEnabled, setSoundEnabled] = useState(false);
   const [isInView, setIsInView] = useState(false);
