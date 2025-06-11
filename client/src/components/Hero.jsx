@@ -8,57 +8,167 @@ const RhinoIcon = () => <span role="img" aria-label="rhino">🦏</span>;
 const BuffaloIcon = () => <span role="img" aria="label">🐃</span>;
 const LeopardIcon = () => <span role="img" aria-label="leopard">🐆</span>;
 const RocketIcon = () => <span role="img" aria-label="rocket">🚀</span>;
+const UfoIcon = () => <span role="img" aria-label="ufo">🛸</span>;
+const FormulaOneCarIcon = () => <span role="img" aria-label="formula one car">🏎️</span>;
 
-const DraggableIcon = ({ icon, initialStyle, type, index, onQuoteClick }) => {
+// DraggableIcon component now accepts 'resetId' and 'onCompleteAnimation' prop
+const DraggableIcon = ({ icon, initialStyle, type, onQuoteClick, onCompleteAnimation, resetId }) => {
   const [isRocketLaunching, setIsRocketLaunching] = useState(false);
+  const [isUfoLaunching, setIsUfoLaunching] = useState(false);
+  const [isF1CarSpeeding, setIsF1CarSpeeding] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
   const dragControls = useDragControls();
 
+  const iconRef = useRef(null);
+  const [randomizedInitialStyle, setRandomizedInitialStyle] = useState(initialStyle);
+
+  useEffect(() => {
+    // This effect runs once to store the initial position for fixed icons (animals)
+    if (iconRef.current && initialStyle && !(type === 'rocket' || type === 'ufo' || type === 'f1car')) {
+      iconRef.current.style.top = initialStyle.top || '';
+      iconRef.current.style.bottom = initialStyle.bottom || '';
+      iconRef.current.style.left = initialStyle.left || '';
+      iconRef.current.style.right = initialStyle.right || '';
+      iconRef.current.style.transform = initialStyle.transform || '';
+    }
+  }, [initialStyle, type]);
+
+  // Effect to randomize positions for specific icon types on mount and when 'resetId' changes
+  // The 'resetId' changing forces a re-randomization after an animation completes
+  useEffect(() => {
+    if (type === 'rocket' || type === 'ufo' || type === 'f1car') {
+      const newTop = `${Math.random() * 60 + 10}%`; // 10% to 70% from top
+      const newLeft = `${Math.random() * 80 + 10}%`; // 10% to 90% from left
+      setRandomizedInitialStyle({ top: newTop, left: newLeft, position: 'absolute' });
+    }
+  }, [type, resetId]); // Dependency on resetId to re-randomize
+
   const getUniqueAnimation = () => {
+    let idleScale = 0.8;
+    if (type === 'f1car') idleScale = 0.7;
+
+    // Helper to call the parent's animation complete handler
+    const triggerParentReset = (animatedType) => {
+      if (onCompleteAnimation) {
+        onCompleteAnimation(animatedType);
+      }
+    };
+
     if (type === 'rocket') {
       return isRocketLaunching ? {
         animate: {
           y: [0, -200, -400, -600],
           rotate: [0, 15, -15, 0],
-          scale: [1, 0.8, 0.6, 0.3],
+          scale: [1, 0.8, 0.6, 1], // Maintain scale
+          opacity: [1, 1, 1, 1], // Maintain opacity (no fade out)
           transition: {
             duration: 3,
             ease: 'easeOut',
             onComplete: () => {
-              setTimeout(() => {
-                setIsRocketLaunching(false);
-              }, 1000);
+              triggerParentReset(type); // Call the helper which calls the prop
+              setIsRocketLaunching(false);
             }
           }
-        }
+        },
+        initial: { ...randomizedInitialStyle, y: 0, rotate: 0, scale: idleScale, opacity: 1 }
       } : {
         animate: {
           y: [0, -4, 0, -6, 0],
           rotate: [0, 1.5, -1.5, 0],
-          scale: [1, 1.01, 1],
+          scale: [idleScale, idleScale + 0.01, idleScale],
           transition: {
-            duration: 3 + index * 0.3,
+            duration: 3,
             repeat: Infinity,
             ease: 'easeInOut',
           }
-        }
+        },
+        initial: randomizedInitialStyle
       };
+    } else if (type === 'ufo') {
+      return isUfoLaunching ? {
+        animate: {
+            x: [0, 200, 400, 800],
+            y: [0, -100, -300, -600],
+            rotate: [0, 30, -30, 0],
+            scale: [1, 0.7, 0.4, 1], // Maintain scale
+            opacity: [1, 1, 1, 1], // Maintain opacity (no fade out)
+            transition: {
+                duration: 4,
+                ease: 'easeOut',
+                onComplete: () => {
+                    triggerParentReset(type); // Call the helper which calls the prop
+                    setIsUfoLaunching(false);
+                }
+            }
+        },
+        initial: { ...randomizedInitialStyle, x: 0, y: 0, rotate: 0, scale: idleScale, opacity: 1 }
+      } : {
+        animate: {
+            y: [0, -7, 0, -5, 0],
+            x: [0, 3, 0, -2, 0],
+            rotate: [0, 2, -2, 0],
+            scale: [idleScale, idleScale + 0.01, idleScale],
+            transition: {
+                duration: 4,
+                repeat: Infinity,
+                ease: 'easeInOut',
+            }
+        },
+        initial: randomizedInitialStyle
+      };
+    } else if (type === 'f1car') {
+        return isF1CarSpeeding ? {
+            animate: {
+                x: [0, -300, -800, -1500],
+                y: [0, 10, -20, 0],
+                rotate: [0, -5, -10, -20],
+                scale: [1, 0.8, 0.6, 1], // Maintain scale
+                opacity: [1, 1, 1, 1], // Maintain opacity (no fade out)
+                transition: {
+                    duration: 2.5,
+                    ease: 'easeOut',
+                    onComplete: () => {
+                      triggerParentReset(type); // Call the helper which calls the prop
+                      setIsF1CarSpeeding(false);
+                    }
+                }
+            },
+            initial: { ...randomizedInitialStyle, x: 0, y: 0, rotate: 0, scale: idleScale, opacity: 1 }
+        } : {
+            animate: {
+                x: [0, 2, 0, -3, 0],
+                y: [0, -2, 0, 3, 0],
+                rotate: [0, 1, -1, 0],
+                scale: [idleScale, idleScale + 0.01, idleScale],
+                transition: {
+                    duration: 2,
+                    repeat: Infinity,
+                    ease: 'easeInOut',
+                }
+            },
+            initial: randomizedInitialStyle
+        };
     }
-    return { animate: {} }; // No animations for other icons
+    // For animal icons, their animation is fixed to initialStyle and they don't use resetId
+    return { animate: {}, initial: initialStyle };
   };
 
   const handleIconClick = () => {
     if (type === 'rocket' && !isRocketLaunching) {
       setIsRocketLaunching(true);
-    } else if (type !== 'rocket') {
+    } else if (type === 'ufo' && !isUfoLaunching) {
+      setIsUfoLaunching(true);
+    } else if (type === 'f1car' && !isF1CarSpeeding) {
+      setIsF1CarSpeeding(true);
+    } else if (['lion', 'elephant', 'rhino', 'buffalo', 'leopard'].includes(type)) {
       onQuoteClick(type);
     }
   };
 
   const iconVariants = {
     hover: {
-      scale: 1.2,
-      rotate: type === 'rocket' ? [0, 360] : [0, 15, -15, 0],
+      scale: 1.05,
+      rotate: type === 'rocket' ? [0, 360] : [0, 10, -10, 0],
       transition: {
         duration: type === 'rocket' ? 0.5 : 0.3,
         ease: 'easeInOut'
@@ -68,23 +178,24 @@ const DraggableIcon = ({ icon, initialStyle, type, index, onQuoteClick }) => {
       scale: 0.9,
     },
     drag: {
-      scale: 1.1,
+      scale: 1.02,
       zIndex: 50,
-      boxShadow: '0 10px 30px rgba(0,0,0,0.3)',
+      boxShadow: '0 5px 15px rgba(0,0,0,0.2)',
     }
   };
 
   return (
     <motion.div
-      className="absolute text-3xl md:text-4xl lg:text-5xl z-30 cursor-grab active:cursor-grabbing select-none"
-      style={initialStyle}
+      ref={iconRef}
+      className="absolute text-2xl md:text-3xl lg:text-4xl z-30 cursor-grab active:cursor-grabbing select-none"
+      style={ (type === 'rocket' || type === 'ufo' || type === 'f1car') ? randomizedInitialStyle : initialStyle}
       drag
       dragControls={dragControls}
       dragConstraints={{
-        top: -50,
-        left: -50,
-        right: window.innerWidth - 100,
-        bottom: window.innerHeight - 100,
+        top: -100,
+        left: -100,
+        right: window.innerWidth + 100,
+        bottom: window.innerHeight + 100,
       }}
       dragElastic={0.1}
       whileHover="hover"
@@ -92,42 +203,46 @@ const DraggableIcon = ({ icon, initialStyle, type, index, onQuoteClick }) => {
       whileDrag="drag"
       variants={iconVariants}
       animate={getUniqueAnimation().animate}
+      initial={getUniqueAnimation().initial}
       onDragStart={() => setIsDragging(true)}
       onDragEnd={() => setIsDragging(false)}
       onClick={handleIconClick}
     >
       <motion.div
-        className={`${isDragging ? 'drop-shadow-2xl' : 'drop-shadow-lg'} transition-all duration-200`}
+        className={`${isDragging ? 'drop-shadow-xl' : 'drop-shadow-md'} transition-all duration-200`}
         animate={{
-          filter: isDragging ? 'brightness(1.2) saturate(1.3)' : 'brightness(1) saturate(1)',
+          filter: isDragging ? 'brightness(1.1) saturate(1.1)' : 'brightness(1) saturate(1)',
         }}
       >
         {icon}
       </motion.div>
-      
-      {type === 'rocket' && isRocketLaunching && (
+
+      {/* Conditional rendering for animation effects (fire/zap/smoke) */}
+      {(type === 'rocket' && isRocketLaunching) || (type === 'ufo' && isUfoLaunching) || (type === 'f1car' && isF1CarSpeeding) ? (
         <motion.div
-          className="absolute -bottom-2 left-1/2 transform -translate-x-1/2"
+          className="absolute -bottom-1 left-1/2 transform -translate-x-1/2"
           initial={{ opacity: 0, scale: 0 }}
-          animate={{ 
-            opacity: [0, 1, 1, 0], 
+          animate={{
+            opacity: [0, 1, 1, 0], // These effects can still fade out
             scale: [0, 1, 2, 3],
             y: [0, 20, 40, 60]
           }}
           transition={{ duration: 3, ease: 'easeOut' }}
         >
-          <span className="text-2xl">🔥</span>
+          {type === 'rocket' && <span className="text-xl">🔥</span>}
+          {type === 'ufo' && <span className="text-xl">⚡</span>}
+          {type === 'f1car' && <span className="text-xl">💨</span>}
         </motion.div>
-      )}
-      
+      ) : null}
+
       {isDragging && (
         <motion.div
           className="absolute inset-0 pointer-events-none"
           animate={{
             boxShadow: [
-              '0 0 10px rgba(59, 130, 246, 0.3)',
-              '0 0 20px rgba(139, 92, 246, 0.3)',
-              '0 0 10px rgba(59, 130, 246, 0.3)',
+              '0 0 5px rgba(59, 130, 246, 0.2)',
+              '0 0 10px rgba(139, 92, 246, 0.2)',
+              '0 0 5px rgba(59, 130, 246, 0.2)',
             ]
           }}
           transition={{ duration: 2, repeat: Infinity }}
@@ -145,14 +260,34 @@ const EnhancedInteractiveHero = () => {
   const heroRef = useRef(null);
   const inView = useInView(heroRef, { once: true });
 
+  // State for reset IDs for each interactive icon type
+  const [rocketResetId, setRocketResetId] = useState(0);
+  const [ufoResetId, setUfoResetId] = useState(0);
+  const [f1CarResetId, setF1CarResetId] = useState(0);
+
   useEffect(() => {
     if (inView) setIsInView(true);
   }, [inView]);
 
+  // Function to increment the reset ID for the specific icon type, passed to DraggableIcon
+  const handleAnimationComplete = (type) => {
+    // A small timeout ensures the animation visually completes before reset
+    setTimeout(() => {
+      if (type === 'rocket') {
+        setRocketResetId(prev => prev + 1);
+      } else if (type === 'ufo') {
+        setUfoResetId(prev => prev + 1);
+      } else if (type === 'f1car') {
+        setF1CarResetId(prev => prev + 1);
+      }
+    }, 50); // Small delay to allow the animation to finish fully
+  };
+
+
   const getBibleBookAndChapter = (category) => {
     const books = {
       proverbs: { name: 'Proverbs', chapters: 31 },
-      psalms: { name: 'Psalm', chapters: 150 }, // Bible API uses "Psalm" not "Psalms"
+      psalms: { name: 'Psalm', chapters: 150 },
       newTestament: [
         { name: 'Matthew', chapters: 28 },
         { name: 'John', chapters: 21 },
@@ -172,7 +307,7 @@ const EnhancedInteractiveHero = () => {
     } else if (category === 'psalms') {
       book = books.psalms.name;
       chapter = Math.floor(Math.random() * books.psalms.chapters) + 1;
-    } else { // newTestament for other animals
+    } else {
       const randomNtBook = books.newTestament[Math.floor(Math.random() * books.newTestament.length)];
       book = randomNtBook.name;
       chapter = Math.floor(Math.random() * randomNtBook.chapters) + 1;
@@ -191,27 +326,24 @@ const EnhancedInteractiveHero = () => {
           bibleCategory = 'proverbs';
         } else if (animalType === 'elephant' || animalType === 'buffalo') {
           bibleCategory = 'psalms';
-        } else { // leopard
+        } else {
           bibleCategory = 'newTestament';
         }
 
         const bookAndChapter = getBibleBookAndChapter(bibleCategory);
         const response = await fetch(`https://bible-api.com/${encodeURIComponent(bookAndChapter)}?random=true`);
-        
+
         if (response.ok) {
           const data = await response.json();
           if (data.verses && data.verses.length > 0) {
             const randomVerse = data.verses[Math.floor(Math.random() * data.verses.length)];
             quoteData.text = randomVerse.text;
-            // FIX START: Ensure bookname is correctly extracted and fallback to book if missing
             quoteData.author = `${randomVerse.bookname || data.bookname || bookAndChapter.split(' ')[0]} ${randomVerse.chapter}:${randomVerse.verse}`;
-            // FIX END
           } else {
             quoteData.text = `No verse found for ${bookAndChapter}.`;
             quoteData.author = 'The Bible';
           }
         } else {
-          // Fallback to local quotes if Bible API fails
           const localQuotes = {
             lion: {
               text: "Courage is not the absence of fear, but the triumph over it. The brave man is not he who does not feel afraid, but he who conquers that fear.",
@@ -241,7 +373,6 @@ const EnhancedInteractiveHero = () => {
           };
         }
       } else {
-        // Existing logic for non-animal types (if any, though in your current code, only animals trigger quotes)
         const response = await fetch('https://api.quotable.io/random?minLength=50&maxLength=150');
         if (response.ok) {
           const data = await response.json();
@@ -257,7 +388,6 @@ const EnhancedInteractiveHero = () => {
       }
     } catch (error) {
       console.error("Error fetching quote/verse:", error);
-      // Fallback to local quotes if any API fails
       const localQuotes = {
         lion: {
           text: "Courage is not the absence of fear, but the triumph over it. The brave man is not he who does not feel afraid, but he who conquers that fear.",
@@ -299,7 +429,7 @@ const EnhancedInteractiveHero = () => {
   const getAnimalWisdom = (animal) => {
     const wisdom = {
       lion: "🦁 Wisdom from Proverbs",
-      elephant: "🐘 Wisdom from Psalms", 
+      elephant: "🐘 Wisdom from Psalms",
       rhino: "🦏 Wisdom from Proverbs",
       buffalo: "🐃 Wisdom from Psalms",
       leopard: "🐆 Wisdom from the New Testament"
@@ -312,8 +442,11 @@ const EnhancedInteractiveHero = () => {
     { icon: <ElephantIcon />, style: { top: '20%', right: '8%' }, type: 'elephant' },
     { icon: <RhinoIcon />, style: { bottom: '15%', left: '5%' }, type: 'rhino' },
     { icon: <BuffaloIcon />, style: { bottom: '20%', right: '5%' }, type: 'buffalo' },
-    { icon: <LeopardIcon />, style: { top: '30%', left: '50%' }, type: 'leopard' },
-    { icon: <RocketIcon />, style: { bottom: '10%', left: '45%' }, type: 'rocket' },
+    { icon: <LeopardIcon />, style: { top: '25%', left: '50%', transform: 'translateX(-50%)' }, type: 'leopard' },
+
+    { icon: <RocketIcon />, type: 'rocket' },
+    { icon: <UfoIcon />, type: 'ufo' },
+    { icon: <FormulaOneCarIcon />, type: 'f1car' },
   ];
 
   return (
@@ -327,16 +460,52 @@ const EnhancedInteractiveHero = () => {
       <div className="absolute inset-0 bg-gradient-to-br from-gray/60 via-gray/40 to-gray/60" />
       <div className="absolute inset-0 bg-gradient-to-t from-gray/80 via-transparent to-gray/20" />
 
-      {floatingIcons.map(({ icon, style, type }, i) => (
-        <DraggableIcon 
-          key={i}
-          icon={icon}
-          initialStyle={style}
-          type={type}
-          index={i}
-          onQuoteClick={handleQuoteClick}
+      {/* Glowing Stars */}
+      {[...Array(20)].map((_, i) => (
+        <motion.div
+          key={`star-${i}`}
+          className="absolute bg-white rounded-full opacity-0"
+          style={{
+            width: `${Math.random() * 2 + 0.5}px`, // 0.5-2.5px
+            height: `${Math.random() * 2 + 0.5}px`,
+            top: `${Math.random() * 100}%`,
+            left: `${Math.random() * 100}%`,
+            boxShadow: `0 0 ${Math.random() * 4 + 1}px rgba(255,255,255,0.7)`, // 1-5px glow
+            zIndex: 0
+          }}
+          animate={{
+            opacity: [0, 1, 0],
+            scale: [0.8, 1.2, 0.8],
+          }}
+          transition={{
+            duration: Math.random() * 3 + 2,
+            repeat: Infinity,
+            repeatType: "reverse",
+            ease: "easeInOut",
+            delay: Math.random() * 5
+          }}
         />
       ))}
+
+      {floatingIcons.map(({ icon, style, type }) => {
+        let currentResetId;
+        if (type === 'rocket') currentResetId = rocketResetId;
+        else if (type === 'ufo') currentResetId = ufoResetId;
+        else if (type === 'f1car') currentResetId = f1CarResetId;
+        else currentResetId = 0; // Animals don't need resetId
+
+        return (
+          <DraggableIcon
+            key={`${type}-${currentResetId}`} // Key now includes resetId for rocket/ufo/f1car to force remount
+            icon={icon}
+            initialStyle={style}
+            type={type}
+            onQuoteClick={handleQuoteClick}
+            onCompleteAnimation={handleAnimationComplete} // Pass the handler down
+            resetId={currentResetId} // Pass resetId as a prop for useEffect dependency
+          />
+        );
+      })}
 
       {showQuote && (
         <motion.div
@@ -356,7 +525,7 @@ const EnhancedInteractiveHero = () => {
             onClick={(e) => e.stopPropagation()}
           >
             <div className="text-center">
-              <motion.h3 
+              <motion.h3
                 className="text-2xl font-bold text-white mb-6 flex items-center justify-center gap-2"
                 initial={{ opacity: 0, y: -20 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -364,7 +533,7 @@ const EnhancedInteractiveHero = () => {
               >
                 {getAnimalWisdom(currentQuote.animal)}
               </motion.h3>
-              
+
               {isLoadingQuote ? (
                 <div className="flex items-center justify-center py-8">
                   <motion.div
@@ -388,8 +557,8 @@ const EnhancedInteractiveHero = () => {
                   </cite>
                 </motion.div>
               )}
-              
-              <motion.div 
+
+              <motion.div
                 className="mt-8 flex gap-4 justify-center"
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -441,7 +610,7 @@ const EnhancedInteractiveHero = () => {
         <motion.div
           className="flex flex-col sm:flex-row gap-4 justify-center mb-8"
           initial={{ opacity: 0, y: 20 }}
-          animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+          animate={isInView ? { opacity: 1, y: 0 } : { opacity: 1, y: 20 }}
           transition={{ delay: 1, duration: 0.8 }}
         >
           <a
