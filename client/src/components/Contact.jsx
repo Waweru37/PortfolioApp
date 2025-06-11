@@ -1,16 +1,52 @@
+import React, { useState } from 'react';
+
 function Contact() {
-    return (
-      <section id="contact" className="min-h-screen bg-transparent py-20 px-6 text-white text-center">
-            <div className="bg-gray-900 bg-opacity-20 p-10 rounded-xl shadow-xl">
+  const [status, setStatus] = useState(''); // 'idle', 'submitting', 'success', 'error'
+  const [message, setMessage] = useState(''); // Message to display to the user
+
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+    setStatus('submitting');
+    setMessage('Sending your message...');
+
+    const form = event.target;
+    const data = new FormData(form);
+
+    try {
+      // Updated with the provided Formspree URL
+      const response = await fetch('https://formspree.io/f/xanjowvg', {
+        method: 'POST',
+        body: data,
+        headers: {
+          'Accept': 'application/json'
+        }
+      });
+
+      if (response.ok) {
+        setStatus('success');
+        setMessage('Thank you for your message! I will get back to you shortly.');
+        form.reset(); // Clear the form fields
+      } else {
+        const result = await response.json();
+        setStatus('error');
+        setMessage(result.errors ? result.errors.map(e => e.message).join(', ') : 'Oops! There was an issue sending your message. Please try again.');
+      }
+    } catch (error) {
+      setStatus('error');
+      setMessage('Network error: Could not connect to the server. Please check your internet connection and try again.');
+    }
+  };
+
+  return (
+    <section id="contact" className="min-h-screen bg-transparent py-20 px-6 text-white text-center">
+      <div className="bg-gray-900 bg-opacity-20 p-10 rounded-xl shadow-xl">
         <div className="max-w-3xl mx-auto">
           <h2 className="text-4xl font-bold mb-6">Contact</h2>
           <p className="mb-10 text-lg text-slate-300">
             Interested in working together or have any questions? Let’s connect!
           </p>
           <form
-            action="mailto:markwaweru37@gmail.com"
-            method="POST"
-            encType="text/plain"
+            onSubmit={handleSubmit} // Use the new handleSubmit function
             className="space-y-6"
           >
             <input
@@ -37,9 +73,15 @@ function Contact() {
             <button
               type="submit"
               className="px-6 py-3 bg-blue-600 hover:bg-blue-700 rounded-lg text-white font-medium shadow-lg transition duration-300"
+              disabled={status === 'submitting'} // Disable button while submitting
             >
-              Send Message
+              {status === 'submitting' ? 'Sending...' : 'Send Message'}
             </button>
+            {status && status !== 'idle' && (
+              <p className={`mt-4 text-center text-lg ${status === 'success' ? 'text-green-400' : 'text-red-400'}`}>
+                {message}
+              </p>
+            )}
           </form>
           <p className="mt-10 text-sm text-slate-400">
             Or reach me directly: <br />
@@ -48,11 +90,9 @@ function Contact() {
             <strong>Location:</strong> Nairobi, Kenya
           </p>
         </div>
-        </div>
-      </section>
-    );
-  }
-  
-  export default Contact;
-  
-  
+      </div>
+    </section>
+  );
+}
+
+export default Contact;
