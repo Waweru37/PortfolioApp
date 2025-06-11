@@ -8,16 +8,21 @@ function About() {
           <div className="max-w-3xl mx-auto">
             <h2 className="text-4xl font-bold mb-6">About Me</h2>
             <p className="text-lg mb-4">
-              I am a <strong className="font-bold">dynamic Software Engineer and strategic Business Innovator</strong> who architects robust full-stack solutions and leverages cloud computing to drive impactful business growth. With a proven track record in Java, C++, React, Android, and advanced network engineering, I translate complex technical challenges into efficient, scalable systems. My approach merges deep analytical insight with ethical foresight, ensuring technology not only performs but also <strong className="font-bold">positively shapes society.</strong>
+              I’m a <strong className="font-bold">Software Engineer and Business Strategist</strong> who builds scalable full-stack solutions that solve real-world problems and drive measurable business growth.
+              With hands-on experience in <strong>Java, C++, React, Android</strong>, and advanced cloud and network engineering, I transform complex challenges into streamlined systems.
             </p>
             <p className="text-lg mb-4">
-              Passionate about fostering a sustainable future, I am dedicated to pioneering advancements in decentralization, green energy, and AI for social good. I thrive in environments where innovation meets purpose, consistently delivering solutions that align technology with strategic business objectives and global sustainability goals.
+              I combine deep technical insight with strategic thinking to deliver robust, ethical, and future-focused solutions. My mission is to develop technology that not only works flawlessly — but also creates meaningful impact.
+            </p>
+            <p className="text-lg mb-4">
+              I’m especially passionate about <strong>decentralized systems, green energy</strong>, and <strong>AI for social good</strong>. I thrive in purpose-driven environments where innovation meets long-term sustainability.
             </p>
             <p className="text-lg">
-              <strong className="font-bold">Let's Connect:</strong><br />
+              <strong className="font-bold">Let’s Connect</strong><br />
               <strong>Email:</strong> markwaweru37@gmail.com<br />
               <strong>Tel:</strong> +254 710 565 193<br />
-              <strong>Location:</strong> Nairobi, Kenya
+              <strong>Location:</strong> Nairobi, Kenya<br />
+              <span className="italic">Open to collaborations in clean tech, ethical AI, and strategic software innovation.</span>
             </p>
           </div>
         </div>
