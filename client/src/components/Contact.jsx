@@ -42,7 +42,7 @@ function Contact() {
       <div className="bg-gray-900 bg-opacity-20 p-10 rounded-xl shadow-xl">
         <div className="max-w-3xl mx-auto">
           <h2 className="text-4xl font-bold mb-6">Contact</h2>
-          <p className="mb-10 text-lg text-slate-300">
+          <p className="mb-10 text-lg text-slate-200">
             Interested in working together or have any questions? Let’s connect!
           </p>
           <form
@@ -83,7 +83,7 @@ function Contact() {
               </p>
             )}
           </form>
-          <p className="mt-10 text-sm text-slate-400">
+          <p className="mt-10 text-sm text-slate-300">
             Or reach me directly: <br />
             <strong>Email:</strong> markwaweru37@gmail.com <br />
             <strong>Phone:</strong> +254 710 565 193 <br />

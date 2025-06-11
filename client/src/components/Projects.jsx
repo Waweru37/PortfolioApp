@@ -45,7 +45,7 @@ function Projects() {
     <section id="projects" className="py-20 px-4 sm:px-6 lg:px-8 bg-transparent text-white">
       <div className="max-w-6xl mx-auto text-center">
         <h2 className="text-4xl font-bold mb-4">My Work & Innovations</h2>
-        <p className="text-lg text-slate-400 mb-12 max-w-3xl mx-auto">
+        <p className="text-lg text-slate-200 mb-12 max-w-3xl mx-auto">
           Here are some of the solutions I've architected, from developer tools to impactful USSD applications transforming key sectors in Kenya.
         </p>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
