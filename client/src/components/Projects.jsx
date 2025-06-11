@@ -12,19 +12,19 @@ const projectData = [
     icon: <Tractor />,
     title: "Soko Suite: Agri-Tech Solutions",
     description: "A comprehensive suite of USSD apps (Sokolink, Sokosupply, Sokorepo) designed to digitize and connect Kenya's agricultural value chain, from farmer to market.",
-    tech: ["USSD", "Python (Django)", "API Integration", "PostgreSQL"]
+    tech: ["USSD", "Python (Django)", "API Integration", "MySQL"]
   },
   {
     icon: <Briefcase />,
     title: "Kazilink",
     description: "A USSD application bridging the gap between job seekers and recruiters, simplifying the hiring process for both informal and formal sector opportunities.",
-    tech: ["USSD", "Node.js", "MongoDB", "Twilio API"]
+    tech: ["USSD", "Node.js", "MongoDB", "React.js", "Twilio API"]
   },
   {
     icon: <Footprints />,
     title: "RiadhaApp",
     description: "A dual-function USSD platform for the athletics community, connecting athletes with coaches and providing a simple, accessible digital training journal.",
-    tech: ["USSD", "PHP (Laravel)", "MySQL", "Gamification"]
+    tech: ["USSD", "Node.js", "React.js", "MySQL", "Gamification"]
   },
   {
     icon: <Bus />,
