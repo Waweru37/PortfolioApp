@@ -364,7 +364,7 @@ const EnhancedInteractiveHero = () => {
             Explore My Work
           </a>
           <a
-            href="/Mark-Waweru-Thuku-Resume.pdf"
+            href="/Mark's Resume.pdf.pdf"
             download
             className="inline-flex items-center justify-center px-6 py-3 text-white bg-gray-700 rounded-full shadow-lg font-semibold hover:bg-gray-600 transition-all duration-300"
           >
