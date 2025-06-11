@@ -5,7 +5,7 @@ import { Github, Linkedin, Download } from 'lucide-react';
 const LionIcon = () => <span role="img" aria-label="lion">🦁</span>;
 const ElephantIcon = () => <span role="img" aria-label="elephant">🐘</span>;
 const RhinoIcon = () => <span role="img" aria-label="rhino">🦏</span>;
-const BuffaloIcon = () => <span role="img" aria-label="buffalo">🐃</span>;
+const BuffaloIcon = () => <span role="img" aria="label">🐃</span>;
 const LeopardIcon = () => <span role="img" aria-label="leopard">🐆</span>;
 const RocketIcon = () => <span role="img" aria-label="rocket">🚀</span>;
 
@@ -149,28 +149,115 @@ const EnhancedInteractiveHero = () => {
     if (inView) setIsInView(true);
   }, [inView]);
 
+  const getBibleBookAndChapter = (category) => {
+    const books = {
+      proverbs: { name: 'Proverbs', chapters: 31 },
+      psalms: { name: 'Psalm', chapters: 150 }, // Bible API uses "Psalm" not "Psalms"
+      newTestament: [
+        { name: 'Matthew', chapters: 28 },
+        { name: 'John', chapters: 21 },
+        { name: 'Romans', chapters: 16 },
+        { name: 'Ephesians', chapters: 6 },
+        { name: 'Philippians', chapters: 4 },
+        { name: 'Colossians', chapters: 4 },
+      ]
+    };
+
+    let book;
+    let chapter;
+
+    if (category === 'proverbs') {
+      book = books.proverbs.name;
+      chapter = Math.floor(Math.random() * books.proverbs.chapters) + 1;
+    } else if (category === 'psalms') {
+      book = books.psalms.name;
+      chapter = Math.floor(Math.random() * books.psalms.chapters) + 1;
+    } else { // newTestament for other animals
+      const randomNtBook = books.newTestament[Math.floor(Math.random() * books.newTestament.length)];
+      book = randomNtBook.name;
+      chapter = Math.floor(Math.random() * randomNtBook.chapters) + 1;
+    }
+    return `${book} ${chapter}`;
+  };
+
   const fetchQuote = async (animalType) => {
     setIsLoadingQuote(true);
+    let quoteData = { text: '', author: '', animal: animalType };
+
     try {
-      const response = await fetch('https://api.quotable.io/random?minLength=50&maxLength=150');
-      if (response.ok) {
-        const data = await response.json();
-        setCurrentQuote({
-          text: data.content,
-          author: data.author,
-          animal: animalType
-        });
+      if (['lion', 'elephant', 'rhino', 'buffalo', 'leopard'].includes(animalType)) {
+        let bibleCategory;
+        if (animalType === 'lion' || animalType === 'rhino') {
+          bibleCategory = 'proverbs';
+        } else if (animalType === 'elephant' || animalType === 'buffalo') {
+          bibleCategory = 'psalms';
+        } else { // leopard
+          bibleCategory = 'newTestament';
+        }
+
+        const bookAndChapter = getBibleBookAndChapter(bibleCategory);
+        const response = await fetch(`https://bible-api.com/${encodeURIComponent(bookAndChapter)}?random=true`);
+        
+        if (response.ok) {
+          const data = await response.json();
+          if (data.verses && data.verses.length > 0) {
+            const randomVerse = data.verses[Math.floor(Math.random() * data.verses.length)];
+            quoteData.text = randomVerse.text;
+            // FIX START: Ensure bookname is correctly extracted and fallback to book if missing
+            quoteData.author = `${randomVerse.bookname || data.bookname || bookAndChapter.split(' ')[0]} ${randomVerse.chapter}:${randomVerse.verse}`;
+            // FIX END
+          } else {
+            quoteData.text = `No verse found for ${bookAndChapter}.`;
+            quoteData.author = 'The Bible';
+          }
+        } else {
+          // Fallback to local quotes if Bible API fails
+          const localQuotes = {
+            lion: {
+              text: "Courage is not the absence of fear, but the triumph over it. The brave man is not he who does not feel afraid, but he who conquers that fear.",
+              author: "Nelson Mandela"
+            },
+            elephant: {
+              text: "The greatest glory in living lies not in never falling, but in rising every time we fall.",
+              author: "Nelson Mandela"
+            },
+            rhino: {
+              text: "Strength does not come from physical capacity. It comes from an indomitable will.",
+              author: "Mahatma Gandhi"
+            },
+            buffalo: {
+              text: "Unity is strength... when there is teamwork and collaboration, wonderful things can be achieved.",
+              author: "Mattie Stepanek"
+            },
+            leopard: {
+              text: "Success is not final, failure is not fatal: it is the courage to continue that counts.",
+              author: "Winston Churchill"
+            }
+          };
+          quoteData = {
+            text: localQuotes[animalType].text,
+            author: localQuotes[animalType].author,
+            animal: animalType
+          };
+        }
       } else {
-        const fallbackResponse = await fetch('https://type.fit/api/quotes');
-        const fallbackData = await fallbackResponse.json();
-        const randomQuote = fallbackData[Math.floor(Math.random() * fallbackData.length)];
-        setCurrentQuote({
-          text: randomQuote.text,
-          author: randomQuote.author ? randomQuote.author.replace(', type.fit', '') : 'Unknown',
-          animal: animalType
-        });
+        // Existing logic for non-animal types (if any, though in your current code, only animals trigger quotes)
+        const response = await fetch('https://api.quotable.io/random?minLength=50&maxLength=150');
+        if (response.ok) {
+          const data = await response.json();
+          quoteData.text = data.content;
+          quoteData.author = data.author;
+        } else {
+          const fallbackResponse = await fetch('https://type.fit/api/quotes');
+          const fallbackData = await fallbackResponse.json();
+          const randomQuote = fallbackData[Math.floor(Math.random() * fallbackData.length)];
+          quoteData.text = randomQuote.text;
+          quoteData.author = randomQuote.author ? randomQuote.author.replace(', type.fit', '') : 'Unknown';
+        }
       }
     } catch (error) {
+      console.error("Error fetching quote/verse:", error);
+      // Fallback to local quotes if any API fails
       const localQuotes = {
         lion: {
           text: "Courage is not the absence of fear, but the triumph over it. The brave man is not he who does not feel afraid, but he who conquers that fear.",
@@ -193,13 +280,13 @@ const EnhancedInteractiveHero = () => {
           author: "Winston Churchill"
         }
       };
-      
-      setCurrentQuote({
+      quoteData = {
         text: localQuotes[animalType].text,
         author: localQuotes[animalType].author,
         animal: animalType
-      });
+      };
     } finally {
+      setCurrentQuote(quoteData);
       setIsLoadingQuote(false);
     }
   };
@@ -211,11 +298,11 @@ const EnhancedInteractiveHero = () => {
 
   const getAnimalWisdom = (animal) => {
     const wisdom = {
-      lion: "🦁 The King's Wisdom",
-      elephant: "🐘 Ancient Wisdom", 
-      rhino: "🦏 Strength & Perseverance",
-      buffalo: "🐃 Unity & Power",
-      leopard: "🐆 Grace & Stealth"
+      lion: "🦁 Wisdom from Proverbs",
+      elephant: "🐘 Wisdom from Psalms", 
+      rhino: "🦏 Wisdom from Proverbs",
+      buffalo: "🐃 Wisdom from Psalms",
+      leopard: "🐆 Wisdom from the New Testament"
     };
     return wisdom[animal] || "Wisdom";
   };
